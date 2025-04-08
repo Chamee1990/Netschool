@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netschoolsrilanka ICT Education Academy</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f8ff;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+        }
+
+        .header {
+            background: linear-gradient(135deg, rgba(0, 78, 146, 0.9), rgba(0, 28, 85, 0.9));
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .nav {
+            background-color: #003366;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        .logo img {
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .logo h2 {
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            position: relative;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            display: block;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links li a:hover {
+            background-color: #004080;
+        }
+
+        .dropdown {
+            position: absolute;
+            background-color: #003366;
+            width: 200px;
+            display: none;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .nav-links li:hover .dropdown {
+            display: block;
+        }
+
+        .dropdown a {
+            padding: 12px 20px;
+            display: block;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .dropdown a:hover {
+            background-color: #004080;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/api/placeholder/1200/600') center/cover;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: #ff6b00;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            background-color: #ff8c00;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2rem;
+            display: inline-block;
+            padding-bottom: 10px;
+            position: relative;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            width: 60%;
+            height: 3px;
+            background-color: #ff6b00;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .grade-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .grade-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .grade-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .grade-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .grade-card-content {
+            padding: 20px;
+        }
+
+        .grade-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #003366;
+        }
+
+        .grade-card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .resource-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .resource-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .resource-list li:before {
+            content: '➤';
+            color: #ff6b00;
+            margin-right: 10px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .feature {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature i {
+            font-size: 3rem;
+            color: #ff6b00;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .feature h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #003366;
+        }
+
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .testimonials {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 60px;
+        }
+
+        .testimonial-slider {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-slider::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .testimonial-slider::-webkit-scrollbar-thumb {
+            background-color: #ff6b00;
+            border-radius: 4px;
+        }
+
+        .testimonial-slider::-webkit-scrollbar-track {
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .testimonial {
+            flex: 0 0 100%;
+            scroll-snap-align: start;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .testimonial img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 3px solid #ff6b00;
+        }
+
+        .testimonial p {
+            font-style: italic;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .testimonial h4 {
+            color: #003366;
+            margin-bottom: 5px;
+        }
+
+        .testimonial span {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .contact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .contact-info {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #003366;
+        }
+
+        .contact-info p {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-info i {
+            margin-right: 10px;
+            color: #ff6b00;
+            font-size: 1.2rem;
+        }
+
+        .contact-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-form h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #003366;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .input-group textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        .footer {
+            background-color: #003366;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 60px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-section h3::after {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 2px;
+            background-color: #ff6b00;
+            bottom: 0;
+            left: 0;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #ff6b00;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .social-links a:hover {
+            background-color: #ff6b00;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ccc;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .dropdown {
+                position: static;
+                width: 100%;
+                display: none;
+            }
+
+            .nav-links li:hover .dropdown {
+                display: block;
+            }
+
+            .contact {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                height: 300px;
+            }
+
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #003366;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #004080;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+
+    <header class="header">
+        <h1>Netschoolsrilanka ICT Education Academy</h1>
+        <p>Empowering students with cutting-edge ICT education from Grade 1 to Grade 11</p>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="/api/placeholder/50/50" alt="Netschoolsrilanka Logo">
+                <h2>Netschoolsrilanka</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li>
+                    <a href="#resources">Resources</a>
+                    <div class="dropdown">
+                        <a href="#notes">Notes</a>
+                        <a href="#past-papers">Past Papers</a>
+                        <a href="#activities">Activities</a>
+                        <a href="#videos">Video Lessons</a>
+                    </div>
+                </li>
+                <li>
+                    <a href="#grades">Grades</a>
+                    <div class="dropdown">
+                        <a href="#primary">Primary (Grade 1-5)</a>
+                        <a href="#middle">Middle (Grade 6-9)</a>
+                        <a href="#secondary">Secondary (Grade 10-11)</a>
+                    </div>
+                </li>
+                <li><a href="#about">About Us</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="content">
+        <section id="home" class="hero">
+            <h2 class="float-animation">Learn ICT with Netschoolsrilanka</h2>
+            <p>Comprehensive ICT education resources for students from Grade 1 to Grade 11</p>
+            <a href="#resources" class="cta-button pulse-animation">Explore Resources</a>
+        </section>
+
+        <section id="resources" class="fade-in">
+            <div class="section-title">
+                <h2>Our Resources</h2>
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <i>📝</i>
+                    <h3>Comprehensive Notes</h3>
+                    <p>Detailed and easy-to-understand notes for all grade levels covering every aspect of the ICT curriculum.</p>
+                </div>
+                <div class="feature">
+                    <i>📋</i>
+                    <h3>Past Papers</h3>
+                    <p>Collection of past examination papers with solutions to help students prepare for assessments.</p>
+                </div>
+                <div class="feature">
+                    <i>🎮</i>
+                    <h3>Interactive Activities</h3>
+                    <p>Engaging activities and projects to reinforce concepts learned in the classroom.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="grades" class="fade-in">
+            <div class="section-title">
+                <h2>Grade-Specific Resources</h2>
+            </div>
+            
+            <div id="primary">
+                <h3 style="margin-bottom: 20px; color: #003366;">Primary Section (Grade 1-5)</h3>
+                <div class="grade-cards">
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 1 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 1</h3>
+                            <p>Introduction to computers and basic digital literacy skills.</p>
+                            <ul class="resource-list">
+                                <li>Computer Basics</li>
+                                <li>Mouse and Keyboard Skills</li>
+                                <li>Educational Games</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 2-3 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 2-3</h3>
+                            <p>Building digital skills through fun activities and simple applications.</p>
+                            <ul class="resource-list">
+                                <li>Basic Drawing Programs</li>
+                                <li>Introduction to Word Processing</li>
+                                <li>Internet Safety</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 4-5 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 4-5</h3>
+                            <p>Advanced digital literacy and introduction to programming concepts.</p>
+                            <ul class="resource-list">
+                                <li>Basic Programming</li>
+                                <li>Digital Presentation Skills</li>
+                                <li>Internet Research</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="middle" style="margin-top: 40px;">
+                <h3 style="margin-bottom: 20px; color: #003366;">Middle Section (Grade 6-9)</h3>
+                <div class="grade-cards">
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 6-7 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 6-7</h3>
+                            <p>Expanded computing knowledge and introduction to office applications.</p>
+                            <ul class="resource-list">
+                                <li>Word Processing</li>
+                                <li>Spreadsheet Basics</li>
+                                <li>Basic Web Design</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 8-9 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 8-9</h3>
+                            <p>Advanced office applications and introduction to programming languages.</p>
+                            <ul class="resource-list">
+                                <li>Database Concepts</li>
+                                <li>Programming Fundamentals</li>
+                                <li>Multimedia Projects</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="secondary" style="margin-top: 40px;">
+                <h3 style="margin-bottom: 20px; color: #003366;">Secondary Section (Grade 10-11)</h3>
+                <div class="grade-cards">
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 10 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 10</h3>
+                            <p>Advanced computing concepts and preparation for O/L examinations.</p>
+                            <ul class="resource-list">
+                                <li>Advanced Programming</li>
+                                <li>Computer Networks</li>
+                                <li>System Development</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                    <div class="grade-card">
+                        <img src="/api/placeholder/300/180" alt="Grade 11 ICT">
+                        <div class="grade-card-content">
+                            <h3>Grade 11</h3>
+                            <p>Final preparation for O/L examinations with comprehensive coverage of all topics.</p>
+                            <ul class="resource-list">
+                                <li>Past Paper Solutions</li>
+                                <li>Model Papers</li>
+                                <li>Revision Notes</li>
+                            </ul>
+                            <a href="#" class="cta-button">View Resources</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="fade-in">
+            <div class="section-title">
+                <h2>About Netschoolsrilanka</h2>
+            </div>
+            <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);">
+                <p style="margin-bottom: 20px; line-height: 1.6;">Netschoolsrilanka ICT Education Academy is dedicated to providing high-quality ICT education to students across Sri Lanka. Our mission is to empower students with essential digital skills necessary for success in the modern world.</p>
+                <p style="margin-bottom: 20px; line-height: 1.6;">Our team of experienced educators and ICT professionals have developed a comprehensive curriculum that aligns with the national education standards while incorporating modern technology trends.</p>
+                <p style="line-height: 1.6;">We believe in making ICT education accessible, engaging, and relevant to students of all ages, preparing them for future academic and career opportunities.</p>
+            </div>
+        </section>
+
+        <section id="testimonials" class="fade-in">
+            <div class="section-title">
+                <h2>What Our Students Say</h2>
+            </div>
+            <div class="testimonials">
+                <div class="testimonial-slider">
+                    <div class="testimonial">
+                        <img src="/api/placeholder/80/80" alt="Student 1">
+                        <p>"Netschoolsrilanka's resources helped me score an A in my ICT O/L examination. The notes are easy to understand and the practice papers were invaluable for my preparation."</p>
+                        <h4>Sameera Perera</h4>
+                        <span>Grade 11 Student</span>
+                    </div>
+                    <div class="testimonial">
+                        <img src="/api/placeholder/80/80" alt="Student 2">
+                        <p>"As a primary school teacher, I find the activities for younger students extremely helpful. My students love the interactive components and are learning digital skills without even realizing it!"</p>
+                        <h4>Nilmini Fernando</h4>
+                        <span>Primary School Teacher</span>
+                    </div>
+                    <div class="testimonial">
+                        <img src="/api/placeholder/80/80" alt="Student 3">
+                        <p>"The programming tutorials for Grade 8 really sparked my interest in coding. Now I'm creating my own small games and applications thanks to the clear explanations and examples."</p>
+                        <h4>Dinesh Wijayasuriya</h4>
+                        <span>Grade 9 Student</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="fade-in">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+            </div>
+            <div class="contact">
+                <div class="contact-info">
+                    <h3>Get In Touch</h3>
+                    <p><i>📍</i> 123 Education Road, Colombo, Sri Lanka</p>
+                    <p><i>📞</i> +94 11 234 5678</p>
+                    <p><i>📧</i> info@netschoolsrilanka.com</p>
+                    <p><i>🕒</i> Monday - Friday: 8:30 AM - 5:00 PM</p>
+                    <p><i>🕒</i> Saturday: 9:00 AM - 1:00 PM</p>
+                    <p><i>🕒</i> Sunday: Closed</p>
+                </div>
+                <div class="contact-form">
+                    <h3>Send us a Message</h3>
+                    <form action="#" method="post">
+                        <div class="input-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" id="subject" name="subject" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" required></textarea>
+                        </div>
+                        <button type="submit" class="cta-button">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Netschoolsrilanka</h3>
+                <p>Empowering students with essential ICT skills for the digital age.</p>
+                <div class="social-links">
+                    <a href="#"><i>F</i></a>
+                    <a href="#"><i>T</i></a>
+                    <a href="#"><i>I</i></a>
+                    <a href="#"><i>Y</i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                    <li><a href="#grades
